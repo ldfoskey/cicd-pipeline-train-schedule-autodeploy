@@ -2,8 +2,7 @@ pipeline {
     agent any
     environment {
         //be sure to replace "willbla" with your own Docker Hub username
-        DOCKER_IMAGE_NAME = "willbla/train-schedule"
-        CANARY_REPLICAS = 0
+        DOCKER_IMAGE_NAME = "ldfoskey007/train-schedule"
     }
     stages {
         stage('Build') {
@@ -43,16 +42,15 @@ pipeline {
             when {
                 branch 'master'
             }
-            environment { 
-                CANARY_REPLICAS = 1
-            }
             steps {
-                kubernetesDeploy(
-                    kubeconfigId: 'kubeconfig',
-                    configs: 'train-schedule-kube-canary.yml',
-                    enableConfigSubstitution: true
-                )
-            }
+                withKubeConfig([credentialsId: 'kubeconfig']) {
+                    script {
+                        sh 'cp ./train-schedule-kube-canary.yml /tmp'
+                        sh 'kubectl create namespace train-schedule-canary'
+                        sh 'kubectl apply -f /tmp/train-schedule-kube-canary.yml && rm /tmp/train-schedule-kube-canary.yml'
+                 }
+              }
+           }
         }
         stage('SmokeTest') {
             when {
@@ -77,21 +75,23 @@ pipeline {
             }
             steps {
                 milestone(1)
-                kubernetesDeploy(
-                    kubeconfigId: 'kubeconfig',
-                    configs: 'train-schedule-kube.yml',
-                    enableConfigSubstitution: true
-                )
+                withKubeConfig([credentialsId: 'kubeconfig']) {
+                    script {
+                        sh 'cp ./train-schedule-kube.yml /tmp'
+                        sh 'kubectl create namespace train-schedule'
+                        sh 'kubectl apply -f /tmp/train-schedule-kube.yml && rm /tmp/train-schedule-kube.yml'
+                  }
+               }
             }
         }
     }
     post {
         cleanup {
-            kubernetesDeploy (
-                kubeconfigId: 'kubeconfig',
-                configs: 'train-schedule-kube-canary.yml',
-                enableConfigSubstitution: true
-            )
+            withKubeConfig([credentialsId: 'kubeconfig']) {
+                script {
+                    sh 'kubectl delete namespace train-schedule-canary'
+                  }
+             }
         }
     }
 }

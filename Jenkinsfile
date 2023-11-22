@@ -59,7 +59,7 @@ pipeline {
             steps {
                 script {
                     def response = httpRequest (
-                        url: "http://$KUBE_MASTER_IP:8082/",
+                        url: "http://$KUBE_NODE_IP:8082/",
                         timeout: 30
                     )
                     if (response.status != 200) {

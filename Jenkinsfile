@@ -59,7 +59,7 @@ pipeline {
             steps {
                 script {
                     sleep (time: 15)
-                    def response = httpRequest (
+                    def response = httpRequest (authentication: 'webserver_login'
                         url: 'http://18.144.59.26:8082',
                         timeout: 30
                     )

@@ -57,7 +57,7 @@ pipeline {
                 branch 'master'
             }
             steps {
-               sleep (time: 15)
+               sleep (time: 30)
                httpRequest url:"http://13.56.76.110:8082", validResponseCodes:'200', timeout: 30
             }
         }

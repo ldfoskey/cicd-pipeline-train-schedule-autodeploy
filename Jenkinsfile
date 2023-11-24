@@ -59,8 +59,7 @@ pipeline {
             steps {
                 script {
                     sleep (time: 15)
-                    def response = httpRequest url: 'http://18.144.59.26:8082',
-                        timeout: 30
+                    def response = httpRequest 'http://18.144.59.26:8082'
                     
                     if (response.status != 200) {
                         error('Smoke test against canary deployment failed.')

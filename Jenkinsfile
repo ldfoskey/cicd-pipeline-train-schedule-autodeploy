@@ -58,7 +58,7 @@ pipeline {
             }
             steps {
                sleep (time: 30)
-               httpRequest url:"http://13.56.76.110:8082", validResponseCodes:'200', timeout: 30
+               httpRequest url:"http://localhost:8082", validResponseCodes:'200', timeout: 30
             }
         }
         stage('DeployToProduction') {

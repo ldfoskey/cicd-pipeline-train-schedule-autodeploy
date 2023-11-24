@@ -57,14 +57,8 @@ pipeline {
                 branch 'master'
             }
             steps {
-                script {
-                    sleep (time: 15)
-                    def response = httpRequest 'http://13.56.76.110:8082'
-                    
-                    if (response.status != 200) {
-                        error('Smoke test against canary deployment failed.')
-                    }
-                }
+               sleep (time: 15)
+               httpRequest url:"http://13.56.76.110:8082", validResponseCodes:'200', timeout: 30
             }
         }
         stage('DeployToProduction') {
